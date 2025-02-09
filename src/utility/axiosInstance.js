@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5001/api", 
+  baseURL: "https://client-eight-rust.vercel.app/api", 
 });
 
 // Request Interceptor
