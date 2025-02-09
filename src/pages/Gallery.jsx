@@ -60,6 +60,7 @@ export default function ImageGallery() {
     try {
       await axiosInstance.post("/images/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
       });
       fetchImages();
       setTitles({});
