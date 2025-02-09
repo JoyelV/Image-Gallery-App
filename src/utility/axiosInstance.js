@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5001/api", 
+  baseURL: "https://image-gallery-backend-plum.vercel.app/api", 
 });
 
 // Request Interceptor
