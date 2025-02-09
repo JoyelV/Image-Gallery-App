@@ -15,7 +15,7 @@ export default function ImageGallery() {
 
   useEffect(() => {
     fetchImages();
-  },[]);
+  }, []);
 
   const fetchImages = async () => {
     try {
@@ -96,6 +96,7 @@ export default function ImageGallery() {
     try {
       await axiosInstance.put(`/images/${editingImage._id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
       });
       setEditingImage(null);
       setNewImageFile(null);
@@ -128,26 +129,8 @@ export default function ImageGallery() {
     <div className="p-2 bg-white min-h-screen">
       <div className="w-full mx-auto bg-white p-4 rounded shadow-md">
         <h2 className="text-xl font-bold mb-4">Image Gallery</h2>
-
-        {/* Upload New Images
-        <input type="file" multiple onChange={handleFileChange} className="mb-4" />
-        {selectedFiles &&
-          Array.from(selectedFiles).map((file, index) => (
-            <input
-              key={index}
-              type="text"
-              placeholder={`Title for ${file.name}`}
-              value={titles[index] || ""}
-              onChange={(e) => handleTitleChange(index, e.target.value)}
-              className="block w-full p-2 border rounded mb-2"
-            />
-          ))}
-        <button onClick={handleUpload} className="bg-blue-500 text-white px-4 py-2 rounded">
-          Upload
-        </button> */}
-
-                {/* Drag & Drop Upload */}
-                <div {...getRootProps()} className="border-dashed border-2 p-6 text-center cursor-pointer mb-4">
+        {/* Drag & Drop Upload */}
+        <div {...getRootProps()} className="border-dashed border-2 p-6 text-center cursor-pointer mb-4">
           <input {...getInputProps()} />
           <p>Drag & drop images here, or click to select files</p>
         </div>
@@ -242,7 +225,7 @@ export default function ImageGallery() {
               onChange={(e) => handleTitleChange(editingImage._id, e.target.value)}
               className="block w-full p-2 border rounded mb-2"
             />
-            <input type="file" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)}className="mb-2" />
+            <input type="file" onChange={(e) => setNewImageFile(e.target.files?.[0] || null)} className="mb-2" />
             <div className="flex justify-between">
               <button onClick={handleUpdateImage} className="bg-green-500 text-white px-3 py-1 rounded">
                 Save
