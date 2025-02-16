@@ -11,6 +11,9 @@ export default function ImageGallery() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [editingImage, setEditingImage] = useState(null);
   const [newImageFile, setNewImageFile] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const imagesPerPage = 6;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,6 +33,11 @@ export default function ImageGallery() {
     } catch (error) {
       console.error("Error fetching images:", error);
     }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleLogout = () => {
@@ -109,9 +117,12 @@ export default function ImageGallery() {
   const handleDragEnd = async (result) => {
     if (!result.destination) return;
 
+    const fromIndex = indexOfFirstImage + result.source.index;
+    const toIndex = indexOfFirstImage + result.destination.index;
+
     const reorderedImages = [...images];
-    const [movedImage] = reorderedImages.splice(result.source.index, 1);
-    reorderedImages.splice(result.destination.index, 0, movedImage);
+    const [movedImage] = reorderedImages.splice(fromIndex, 1);
+    reorderedImages.splice(toIndex, 0, movedImage);
 
     const updatedImageOrder = reorderedImages.map((img, index) => ({ _id: img._id, order: index }));
 
@@ -124,6 +135,21 @@ export default function ImageGallery() {
       fetchImages();
     }
   };
+
+  const filteredImages = images.filter(image =>
+    image.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+  );  
+
+  const indexOfLastImage = currentPage * imagesPerPage;
+  const indexOfFirstImage = indexOfLastImage - imagesPerPage;
+  const currentImages = filteredImages.slice(indexOfFirstImage, indexOfLastImage);
+
+  const totalPages = Math.ceil(filteredImages.length / imagesPerPage);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
 
   return (
     <div className="p-2 bg-white min-h-screen">
@@ -157,6 +183,15 @@ export default function ImageGallery() {
           Upload
         </button>
 
+        {/* Search Bar */}
+        <input
+          type="text"
+          placeholder="Search by title..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="block w-full p-2 border rounded mt-3 mb-4"
+        />
+
         {/* Display Images with Drag & Drop */}
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="image-list" direction="horizontal">
@@ -166,7 +201,7 @@ export default function ImageGallery() {
                 {...provided.droppableProps}
                 className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-2"
               >
-                {images.map((image, index) => (
+                {currentImages.map((image, index) => (
                   <Draggable key={image._id} draggableId={image._id} index={index}>
                     {(provided) => (
                       <div
@@ -204,6 +239,25 @@ export default function ImageGallery() {
             )}
           </Droppable>
         </DragDropContext>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="bg-gray-300 px-4 py-2 rounded mx-2"
+          >
+            Prev
+          </button>
+          <span className="px-4 py-2">Page {currentPage} of {totalPages}</span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="bg-gray-300 px-4 py-2 rounded mx-2"
+          >
+            Next
+          </button>
+        </div>
 
         <button
           onClick={handleLogout}
